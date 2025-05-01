@@ -80,7 +80,3 @@ class IherbSpiderSpider(CrawlSpider):
 
             yield product
 
-
-'''
-Re-arrange order of Package_Quantity_and_Pice based on actual page
-'''
