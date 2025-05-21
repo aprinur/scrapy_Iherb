@@ -5,9 +5,9 @@
 import logging
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
 from sqlalchemy.exc import IntegrityError
 
+from db_exporter import db_toexcel
 from .items import Session, IherbAlchemy
 
 
@@ -26,7 +26,8 @@ class IherbPipeline:
         item['Reviews'] = int(item['Reviews'].replace(',', '')) if item['Reviews'] else item['Reviews']
         item['UPC'] = int(item['UPC'])
         item['Best_by'] = item['Best_by'].strip().removeprefix("Best by: ") if item['Best_by'] else item['Best_by']
-        item['First_available'] = item['First_available'].strip() if item['First_available'] else item['First_available']
+        item['First_available'] = item['First_available'].strip() if item['First_available'] else item[
+            'First_available']
         item['Dimension'] = item['Dimension'].strip() if item['Dimension'] else item['Dimension']
         return item
 
@@ -35,11 +36,15 @@ class AlchemyPipeline:
     def __init__(self):
         pass
 
+
     def open_spider(self, spider):
         self.session = Session()
 
+
     def close_spider(self, spider):
         self.session.close()
+        db_toexcel()
+
 
     def process_item(self, item, spider):
         product = IherbAlchemy(**item)

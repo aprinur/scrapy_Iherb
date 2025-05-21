@@ -32,7 +32,7 @@ class IherbItem(scrapy.Item):
 
 
 class IherbAlchemy(Base):
-    __tablename__ = 'product_4'
+    __tablename__ = 'Iherb_Product_Information'
 
     id = Column(Integer, nullable=False, primary_key=True, unique=True)
     Name = Column(String, nullable=False)

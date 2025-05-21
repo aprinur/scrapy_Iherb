@@ -31,9 +31,11 @@ class IherbSpiderSpider(CrawlSpider):
         Rule(products_links, callback="parse_item"),
     )
 
+
     def parse_start_url(self, response: Response, **kwargs: Any) -> Any:
         for element in response.css('a[data-ga-event-action="Click Trending Brands"]::attr(href)'):
             yield scrapy.Request(element.get())
+
 
     def parse_item(self, response):
         pattern = r'\([^\(]+\)'
@@ -46,11 +48,13 @@ class IherbSpiderSpider(CrawlSpider):
             product['Reviews'] = element.css('a.rating-count.scroll-to *::text').get() or None
             product["Image_url"] = element.css('div.thumbnail-item.selected img::attr(src)').get()
             product["Flavours"] = element.css('.thumbnail-tile::attr(title)').getall() or None
-            if element.css('div.attribute-group-package-quantity.attribute-tile-group'):  # Multi-option with multiple prices
+            if element.css(
+                    'div.attribute-group-package-quantity.attribute-tile-group'):  # Multi-option with multiple prices
                 options = [i.strip() for i in element.css('div.attribute-name::text').getall()]
                 prices = [i.strip() for i in element.css('div.price-container bdi::text').getall()]
                 product['Packages_Quantity_and_Price'] = " | ".join(str(i) for i in list(zip(options, prices)))
-            elif response.css('section#super-special-price') and element.css('div.attribute-group-options.attribute-tile-group'):  # Multiple option with discount prices
+            elif response.css('section#super-special-price') and element.css(
+                    'div.attribute-group-options.attribute-tile-group'):  # Multiple option with discount prices
                 options = [elm.strip() for elm in element.css('div.attribute-name::text').getall()]
                 special = element.css('a#special-price ::text').get()
                 price = element.css('b.s24::text').get()
@@ -66,7 +70,8 @@ class IherbSpiderSpider(CrawlSpider):
             elif response.css('span.title.title-prohibited'):  # Unavailable product in a region
                 product['Packages_Quantity_and_Price'] = response.css('span.title.title-prohibited::text').get()
             else:  # Single option with single price
-                option = element.css('span.package-quantity::text').get().strip() if element.css('span.package-quantity::text') else None
+                option = element.css('span.package-quantity::text').get().strip() if element.css(
+                    'span.package-quantity::text') else None
                 price = response.css('div.price-inner-text p::text').get().strip()
                 product['Packages_Quantity_and_Price'] = str((option, price))
             product["Authentic_level"] = element.css('li.color-primary::text').get().strip()
@@ -79,4 +84,3 @@ class IherbSpiderSpider(CrawlSpider):
             product["Dimension"] = element.css('span#dimensions::text').get()
 
             yield product
-
